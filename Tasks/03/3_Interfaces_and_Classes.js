@@ -112,13 +112,14 @@ var Task3;
         { name: "Bruce Willis", age: 64, role: "World saver" },
     ];
     function logPerson(user) {
-        console.log(` - ${user.name}, ${user.age}, ${user.role}`);
-        console.log(user.role !== "undefined");
-        // if ((user as Admin).role !== "undefined") {
-        //   console.log(` - ${user.name}, ${user.age}, ${(user as Admin).role}`);
-        // } else {
-        //   console.log(` - ${user.name}, ${user.age}, ${user.occupation}`);
-        // }
+        // console.log(` - ${user.name}, ${user.age}, ${(user as Admin).role}`);
+        // console.log(typeof (user as Admin).role !== "undefined");
+        if (typeof user.role !== "undefined") {
+            console.log(` - ${user.name}, ${user.age}, ${user.role}`);
+        }
+        else {
+            console.log(` - ${user.name}, ${user.age}, ${user.occupation}`);
+        }
     }
     Task3.logPerson = logPerson;
     console.log("\nTASK3");

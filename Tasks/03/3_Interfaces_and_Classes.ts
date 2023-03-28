@@ -147,13 +147,11 @@ namespace Task3 {
   ];
 
   export function logPerson(user: User | Admin) {
-    console.log(` - ${user.name}, ${user.age}, ${(user as Admin).role}`);
-    console.log((user as Admin).role !== "undefined");
-    // if ((user as Admin).role !== "undefined") {
-    //   console.log(` - ${user.name}, ${user.age}, ${(user as Admin).role}`);
-    // } else {
-    //   console.log(` - ${user.name}, ${user.age}, ${user.occupation}`);
-    // }
+    if (typeof (user as Admin).role !== "undefined") {
+      console.log(` - ${user.name}, ${user.age}, ${(user as Admin).role}`);
+    } else {
+      console.log(` - ${user.name}, ${user.age}, ${user.occupation}`);
+    }
   }
 
   console.log("\nTASK3");
