@@ -73,12 +73,14 @@ const listOfPersonsWithFood: PersonWithFoodType[] = [
   { name: "Bob", age: 21, favouriteFood: "pancake" },
 ];
 
+const test = (x: any, y: any): any => x;
+
 // With the 'any' type, we can assign any type of value to a variable (or pass data to a method like an argument).
 // For example:
 // let data: any = "some data";
 // data = 1;
 // data = true;
-// If "noImplicitAny" is set to true in the tsconfig.json file, then we can't use the 'any' keyword.
+// If "noImplicitAny" is set to true in the tsconfig.json file, then the compiler won't use 'any' as a type, but we can use it (explicitly, like in the example above)
 
 /*  
         Task 2 
@@ -86,7 +88,20 @@ const listOfPersonsWithFood: PersonWithFoodType[] = [
     ~ Write a function argument type check and, if a string value is passed, display the error "Incorrect input!"
 */
 
-//Add code here...
+// 1
+const sum = (x: number, y: number): number => x + y;
+
+// 2
+const sum2 = (x: number | string, y: number | string): number => {
+  if (typeof x === "string" || typeof y === "string") {
+    throw new Error("Incorrect input!");
+  }
+  return x + y;
+};
+
+console.log("\nTASK 2");
+console.log(sum(1, 2));
+console.log(sum2(1, 2));
 
 /*  
         Task 3 
@@ -94,7 +109,20 @@ const listOfPersonsWithFood: PersonWithFoodType[] = [
     ~ Write a function to check that A is not one of the following list null, undefined, NaN, '', 0, false 
 */
 
-//Add code here...
+// 1
+let value: any = "example";
+
+// 2
+const isValueIn = (A: any): boolean => {
+  const list = [null, undefined, NaN, "", 0, false];
+  if (list.includes(A)) {
+    return true;
+  }
+  return false;
+};
+
+console.log("\nTASK 3");
+console.log(isValueIn(null));
 
 /*  
         Task 4 
@@ -103,15 +131,38 @@ const listOfPersonsWithFood: PersonWithFoodType[] = [
     ~ When set to 'as-number', output the sum of numbers, when set to 'as-string', concatenate strings. 
 */
 
-//Add code here...
+const combine = (
+  x: number | string,
+  y: number | string,
+  numberOrString: "as-number" | "as-string"
+): number | string => {
+  if (numberOrString === "as-number") {
+    return (x as number) + (y as number);
+  }
+  return (x as string) + (y as string);
+};
+console.log("\nTASK 4");
+console.log(combine(1, 2, "as-number"));
+console.log(combine("a", "b", "as-string"));
 
 /*  
         Task 5 
     ~ Declare a constant of type Tuple that stores the code (404) and the text of the error ("Error!"). 
     ~ Copy the function from Task 3 and change it so that if the condition is not met, the error code and text will be displayed.
 */
-
-//Add code here...
+namespace Task5 {
+  console.log("\nTASK 5");
+  const errorTuple: [number, string] = [404, "Error!"];
+  const isValueIn = (A: any): string => {
+    const list = [null, undefined, NaN, "", 0, false];
+    if (list.includes(A)) {
+      return `The value '${A}' is in the list.`;
+    }
+    return `Error code: ${errorTuple[0]}, error message: ${errorTuple[1]}`;
+  };
+  console.log(isValueIn("a"));
+  console.log(isValueIn(""));
+}
 
 /*  
         Task 6 
@@ -121,7 +172,34 @@ const listOfPersonsWithFood: PersonWithFoodType[] = [
     ~ Print the name of the property and its value to the console. Each property on a new line.
 */
 
-//Add code here...
+namespace Task6 {
+  enum RoleType {
+    Admin,
+    Author,
+    Moderator,
+  }
+  export type PersonType = {
+    name: string;
+    age: number;
+    gender: "male" | "female" | "other";
+    role: RoleType;
+  };
+
+  const person: PersonType = {
+    name: "Bob",
+    age: 33,
+    gender: "male",
+    role: RoleType.Admin,
+  };
+  const printPerson = <T extends PersonType>(person: T) => {
+    for (let key in person) {
+      console.log(`${key}: ${person[key]}`);
+    }
+  };
+
+  console.log("\nTASK 6");
+  printPerson(person);
+}
 
 /*  
         Task 7 
@@ -131,7 +209,39 @@ const listOfPersonsWithFood: PersonWithFoodType[] = [
 
 */
 
-//Add code here...
+namespace Task7 {
+  enum RoleType {
+    Admin = "admin",
+    Author = "author",
+    Moderator = "moderator",
+  }
+
+  const person1: Task6.PersonType = {
+    name: "Bob",
+    age: 33,
+    gender: "male",
+    role: RoleType.Admin,
+  };
+  const person2: Task6.PersonType = {
+    name: "Alice",
+    age: 22,
+    gender: "female",
+    role: RoleType.Moderator,
+  };
+  const person3: Task6.PersonType = {
+    name: "Frank",
+    age: 53,
+    gender: "male",
+    role: RoleType.Author,
+  };
+  const printPersons = (personArray: Task6.PersonType[]) => {
+    personArray.map((person) =>
+      console.log(`My name is ${person.name}. I am ${person.role}`)
+    );
+  };
+  console.log("\nTASK 7");
+  printPersons([person1, person2, person3]);
+}
 
 /*  
         Task 8
@@ -145,14 +255,29 @@ const listOfPersonsWithFood: PersonWithFoodType[] = [
 
 */
 
-//Add code here...
+namespace Task8 {
+  console.log("\nTASK 8");
+
+  const addAndHandle = (x: number, y: number, callback: any): void => {
+    const result = sum(x, y);
+    callback(result);
+  };
+
+  addAndHandle(10, 20, (result) => {
+    console.log(result);
+  });
+}
 
 /*  
         Task 9
     ~ Write a function with a return value of type never
 */
 
-//Add code here...
+const createAndThrowError = (code: number, message: string): never => {
+  throw new Error(`Error code: ${code}, message: ${message}`);
+};
+console.log("\nTASK 9");
+//createAndThrowError(404, "Not Found");
 
 /*  
         Task 10
@@ -161,7 +286,40 @@ const listOfPersonsWithFood: PersonWithFoodType[] = [
     ~ Display cities and the number of people living in them in the console. 
 */
 
-//Add code here...
+console.log("\nTASK 10");
+const getPopulation = (
+  city: "Kharkiv" | "Kyiv" | "Lviv" | "Odessa"
+): number => {
+  // Population data from 2017
+  switch (city) {
+    case "Kharkiv":
+      return 1419000;
+    case "Kyiv":
+      return 2884000;
+    case "Lviv":
+      return 721301;
+    case "Odessa":
+      return 993120;
+    default:
+      throw new Error("Wrong city input!");
+  }
+};
+
+enum cities {
+  Kharkiv = getPopulation("Kharkiv"),
+  Kyiv = getPopulation("Kyiv"),
+  Lviv = getPopulation("Lviv"),
+  Odessa = getPopulation("Odessa"),
+}
+
+for (let i = 0; i < Object.keys(cities).length; i++) {
+  // in order to avoid the number type keys
+  if (typeof Object.values(cities)[i] === "string") {
+    const actualCity = Object.values(cities)[i];
+    const actualPopulation = Object.keys(cities)[i];
+    console.log(`${actualCity}: ${actualPopulation}`);
+  }
+}
 
 /*
         Task 11
@@ -169,7 +327,18 @@ const listOfPersonsWithFood: PersonWithFoodType[] = [
     ~ Write a function that will print the country(s) whose name ends with 'a'.
 */
 
-//Add code here...
+const countries = ["England", "Canada", "Germany", "Scotland", "India"];
+
+const printCountry = (countries: string[]): void => {
+  countries.map((country) => {
+    if (country[country.length - 1] === "a") {
+      console.log(country);
+    }
+  });
+};
+
+console.log("\nTASK 11");
+printCountry(countries);
 
 // ADVANCED LEVEL
 
@@ -179,11 +348,72 @@ const listOfPersonsWithFood: PersonWithFoodType[] = [
     ~ The 'without' method must return a copy of the object, excluding all properties of the specified type.
 */
 
-//Add code here...
+const without = (inputObj: any, withoutThisType: any): any => {
+  // The output object
+  const outputObj = {};
+
+  // Loop through the inputObject's keys
+  for (let key of Object.keys(inputObj)) {
+    // If the actual value's type is not the same as the withoutThisType
+    if (typeof inputObj[key] !== withoutThisType) {
+      // Add the value to the output object
+      outputObj[key] = inputObj[key];
+    }
+  }
+  return outputObj;
+};
+
+// An object to try out the function
+const obj1 = {
+  name: "Bob",
+  age: 21,
+  isAdmin: true,
+};
+
+console.log("\nTASK 13");
+console.log(without(obj1, "number"));
 
 /*  
         Task 14
     ~ Write an 'isEmpty' function that checks if an object is empty, regardless of its nesting. Must return true for objects { a: { b: undefined }, { a: { b: [] } }, {}, { a: { b: [ { c: [] } ] } }
 */
 
-//Add code here...
+console.log("\nTASK 14");
+const isEmpty = (obj: any): boolean => {
+  // Loop through the object
+  for (const key in obj) {
+    // Save the current value
+    const currentValue = obj[key];
+
+    if (currentValue === undefined || currentValue === null) {
+      // Skip the execution and 'jump' to the next object property
+      continue;
+    }
+    // If the current value is an object
+    if (typeof currentValue === "object") {
+      // Call this function with the current value (which can be any type)
+      if (!isEmpty(currentValue)) {
+        // If the recursive call returns false
+        return false;
+      }
+    }
+    // If the current value is an array
+    else if (Array.isArray(currentValue)) {
+      if (currentValue.length > 0) {
+        return false;
+      }
+    }
+    // If the current value has a different type (like a primitive type, etc.)
+    else {
+      return false;
+    }
+  }
+  return true;
+};
+
+console.log(isEmpty({ a: { b: undefined } })); // true
+console.log(isEmpty({ a: { b: [] } })); // true
+console.log(isEmpty({})); // true
+console.log(isEmpty({ a: { b: [{ c: [] }] } })); // true
+console.log(isEmpty({ a: { b: "hello" } })); // false
+console.log(isEmpty({ a: { b: [1, 2, 3] } })); // false
