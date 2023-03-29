@@ -178,7 +178,52 @@ namespace Task3 {
      }
 */
 
-//Add code here...
+namespace Task4 {
+  export interface User {
+    name: string;
+    age: number;
+    occupation?: string;
+  }
+
+  export interface Admin extends User {
+    role?: string;
+  }
+
+  export const users: Admin[] = [
+    {
+      name: "Max Mustermann",
+      age: 25,
+      occupation: "Chimney sweep",
+    },
+    {
+      name: "Kate Müller",
+      age: 23,
+      occupation: "Astronaut",
+    },
+    { name: "Jane Doe", age: 32, role: "Administrator" },
+    { name: "Bruce Willis", age: 64, role: "User" },
+  ];
+
+  function isAdmin(person: Admin | User): boolean {
+    return (person as Admin).role === "Administrator";
+  }
+
+  export function logPerson(user: User | Admin) {
+    if (isAdmin(user)) {
+      console.log(` - ${user.name}, ${user.age}, ${(user as Admin).role}`);
+    } else {
+      let output = ` - ${user.name}, ${user.age}`;
+      if (user.occupation) {
+        output += `, ${user.occupation}`;
+      }
+      console.log(output);
+    }
+  }
+
+  console.log("\nTASK4");
+  console.log("Users:");
+  users.forEach(logPerson);
+}
 
 /*
         Task 5
@@ -189,7 +234,114 @@ namespace Task3 {
     ~ Output to the console separate lists of Users, Admins, Super Users
 */
 
-//Add code here...
+namespace Task5 {
+  export interface User {
+    name: string;
+    age: number;
+    type: "user" | "admin" | "superuser";
+    occupation: string;
+  }
+
+  export interface Admin extends User {
+    role: string;
+  }
+
+  export interface SuperUser extends Exclude<Admin, "type"> {
+    type: "superuser";
+  }
+
+  type PersonsArray = User[] | Admin[] | SuperUser[];
+
+  export const persons: PersonsArray = [
+    // Users
+    {
+      name: "Max Mustermann",
+      age: 25,
+      occupation: "Chimney sweep",
+      type: "user",
+    },
+    {
+      name: "Kate Müller",
+      age: 23,
+      occupation: "Astronaut",
+      type: "user",
+    },
+
+    // Admins
+    { name: "Jane Doe", age: 32, role: "Researcher", type: "admin" } as Admin,
+    {
+      name: "Bruce Willis",
+      age: 64,
+      role: "World Saver",
+      type: "admin",
+    } as Admin,
+
+    // SuperUsers
+    { name: "Bob", age: 34, role: "SuperUser", type: "superuser" } as SuperUser,
+    {
+      name: "Super User",
+      age: 41,
+      role: "Lead SuperUser",
+      type: "superuser",
+    } as SuperUser,
+  ];
+
+  function isAdmin(person: User): boolean {
+    return person.type === "admin";
+  }
+
+  function isUser(person: User): boolean {
+    return person.type === "user";
+  }
+
+  function isSuperUser(person: User): boolean {
+    return person.type === "superuser";
+  }
+
+  function logPerson(user: User | Admin | SuperUser) {
+    // These two property are common in both types
+    let output = ` - name: ${user.name}, age: ${user.age}, type: ${user.type}`;
+
+    if (isUser(user)) {
+      // The occupation is unique for User type
+      output += `, occupation: ${user.occupation}`;
+    } else if (isAdmin(user)) {
+      // The role is unique for Admin type
+      output += `, role: ${(user as Admin).role}`;
+    }
+    console.log(output);
+  }
+
+  export function processAndLogPersons(persons: PersonsArray) {
+    const users: User[] = [];
+    const admins: Admin[] = [];
+    const superusers: SuperUser[] = [];
+
+    // Separate persons to arrays
+    persons.forEach((person) => {
+      if (isUser(person)) {
+        users.push(person);
+      } else if (isAdmin(person)) {
+        admins.push(person as Admin);
+      } else {
+        superusers.push(person as SuperUser);
+      }
+    });
+
+    // Log out the persons
+    console.log("Users:");
+    users.forEach(logPerson);
+
+    console.log("Admins:");
+    admins.forEach(logPerson);
+
+    console.log("SuperUsers:");
+    superusers.forEach(logPerson);
+  }
+
+  console.log("\nTASK5");
+  processAndLogPersons(persons);
+}
 
 /*
         Task 6
@@ -199,7 +351,34 @@ namespace Task3 {
     ~ Create an instance of the class and output to the console whether today is a good day for walking;)
 */
 
-//Add code here...
+namespace Task6 {
+  class Weather {
+    // Properties
+    private windSpeed: number = 0;
+    private chanceOfRain: number = 0;
+
+    // Initializer
+    constructor(windSpeed: number, chanceOfRain: number) {
+      this.windSpeed = windSpeed;
+      this.chanceOfRain = chanceOfRain;
+    }
+
+    public isDayForWalk(): boolean {
+      if (this.windSpeed < 5 && this.chanceOfRain < 30) {
+        return true;
+      }
+      return false;
+    }
+  }
+
+  console.log("\nTASK6");
+
+  // Create an instance of the class
+  const day1 = new Weather(4, 29);
+
+  // Print out whether today is a good day for walking
+  console.log(day1.isDayForWalk());
+}
 
 /*
         Task 7
@@ -213,11 +392,118 @@ namespace Task3 {
     ~ Use the method overriding mechanism!
 */
 
-//Add code here...
+namespace Task7 {
+  class Point2D {
+    // Properties
+    protected x: number;
+    protected y: number;
+
+    // These getters are not in the tasks, these are just a little functionalities that give back the values securely
+    get X() {
+      return this.x;
+    }
+
+    get Y() {
+      return this.y;
+    }
+
+    // Initializer
+    constructor(x: number = 0, y: number = 0) {
+      this.x = x;
+      this.y = y;
+    }
+
+    // Reset method
+    reset(): void {
+      this.x = 0;
+      this.y = 0;
+    }
+  }
+
+  class Point3D extends Point2D {
+    // Property
+    private z: number;
+
+    // This getter is not in the tasks, this is just a little functionality that gives back the value securely
+    get Z() {
+      return this.z;
+    }
+
+    // Initializer
+    constructor(x: number = 0, y: number = 0, z: number = 0) {
+      // Call the parent's constructor with x and y
+      super(x, y);
+      this.z = z;
+    }
+
+    reset(): void {
+      // Reset x and y coordinates
+      super.reset();
+      this.z = 0;
+    }
+  }
+
+  console.log("\nTASK7");
+  const point3D = new Point3D(1, 2, 3);
+  console.log(
+    `point3D after initialization: ${point3D.X}, ${point3D.Y}, ${point3D.Z}`
+  );
+
+  // Reset point3D
+  point3D.reset();
+
+  console.log(
+    `point3D after reset the coordinates: ${point3D.X}, ${point3D.Y}, ${point3D.Z}`
+  );
+}
 
 /*
         Task 8
     ~ Implement the class hierarchy shown in Figure 1
 */
+class Telephone {
+  makeCall() {}
+  hangUp() {}
+}
 
-//Add code here...
+// The left 'subtree' from Telephone
+class Landline extends Telephone {}
+
+class Rotary extends Landline {
+  rotaryInput() {}
+}
+
+class PushButton extends Landline {
+  buttonInput() {}
+}
+
+// The right 'subtree' from Telephone
+class Cellular extends Telephone {
+  sendSMS() {}
+}
+
+class Smart extends Cellular {
+  touchInput() {}
+  accessInternet() {}
+}
+
+class IPhone extends Smart {
+  iOS() {}
+}
+
+class Android extends Smart {
+  androidOS() {}
+}
+
+class Windows extends Smart {
+  windowsOS() {}
+}
+
+class NonSmart extends Cellular {
+  buttonInput() {}
+}
+
+// To test the relationship
+const windows = new Windows();
+// makeCall() comes from Telephone
+windows.makeCall();
