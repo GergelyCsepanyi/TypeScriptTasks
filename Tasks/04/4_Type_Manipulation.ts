@@ -141,7 +141,7 @@ console.log(sum(1, 2, 4, 6)); // 13
 type Keys = "name" | "address";
 type Accessors = "get" | "set";
 
-type AccessorMethods = Record<Accessors, Keys>;
+type Methods = `${Accessors}${Capitalize<Keys>}`;
 
 /*  
         Task 7
