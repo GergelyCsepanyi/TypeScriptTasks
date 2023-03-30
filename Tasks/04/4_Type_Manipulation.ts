@@ -39,6 +39,7 @@ const getRandomElement = <T>(): T => {
   return typeArray01[randomIndex] as T;
 };
 
+console.log("TASK1");
 console.log(getRandomElement<number>());
 
 /*  
@@ -49,19 +50,26 @@ console.log(getRandomElement<number>());
     ~ Print the result of the function to the console
 */
 
-// function myFilter(arr, predicate) {
-// const result = [];
-// for (const elm of arr) {
-//     if (predicate(elm)) {
-//     result.push(elm);
-//     }
-// }
-// return result;
-// }
+function myFilter<T>(arr: T[], predicate: (elm: T) => boolean): T[] {
+  const result = [];
+  for (const elm of arr) {
+    if (predicate(elm)) {
+      result.push(elm);
+    }
+  }
+  return result;
+}
+
+const arr = [1, 2, 3, 4, 5];
+const filteredArr = myFilter<number>(arr, (elm: number): boolean => elm > 2);
+console.log("\nTASK2");
+console.log(filteredArr);
 
 // Usage example
-// const res = myFilter([1, 2, 3, 4, 5], num => num % 2 === 0);
-// const res2 = myFilter(['foo', 'hoge', 'bar'], str => str.length >= 4);
+const res = myFilter([1, 2, 3, 4, 5], (num) => num % 2 === 0);
+const res2 = myFilter(["foo", "hoge", "bar"], (str) => str.length >= 4);
+console.log(res);
+console.log(res2);
 
 /*  
         Task 3 
@@ -70,16 +78,23 @@ console.log(getRandomElement<number>());
     ~ Write an example and print the result of using the function to the console
 */
 
-// function getPrice(price: Price): number {
-//     switch (speed) {
-//       case "low":
-//         return 50;
-//       case "medium":
-//         return 100;
-//       case "high":
-//         return 150;
-//     }
-//   }
+type Price = "low" | "medium" | "high";
+
+function getPrice(price: Price): number {
+  switch (price) {
+    case "low":
+      return 50;
+    case "medium":
+      return 100;
+    case "high":
+      return 150;
+  }
+}
+
+console.log("\nTASK3");
+console.log(getPrice("low"));
+console.log(getPrice("medium"));
+console.log(getPrice("high"));
 
 /*  
         Task 4
@@ -88,13 +103,18 @@ console.log(getRandomElement<number>());
     ~ Print the result of using the function to the console
 */
 
-// function addRole(obj) {
-//     const role = 'user';
-//     return {
-//       ...obj,
-//       role
-//     };
-//   }
+// This '{ [key: string]: any }' and this 'Record<string, any>' is same
+function addRole(obj: { [key: string]: any }): Record<string, any> {
+  const role = "user";
+  return {
+    ...obj,
+    role,
+  };
+}
+
+console.log("\nTASK4");
+console.log(addRole({ name: "Bob" }));
+console.log(addRole({ name: "Tom", age: 44 }));
 
 /*  
         Task 5
@@ -102,8 +122,15 @@ console.log(getRandomElement<number>());
     ~ Specify the types of arguments and return value of a function
 */
 
-// console.log(sum(1, 2)); // 3
-// console.log(sum(1,2,4,6)); // 13
+const sum = (...args: number[]): number => {
+  let sum = 0;
+  args.forEach((actualNumber) => (sum += actualNumber));
+  return sum;
+};
+
+console.log("\nTASK4");
+console.log(sum(1, 2)); // 3
+console.log(sum(1, 2, 4, 6)); // 13
 
 /*  
         Task 6
@@ -111,20 +138,30 @@ console.log(getRandomElement<number>());
     ~ Get from Keys and Accessors the type Methods ("getName" | "getAddress" | "setName" | "setAddress") using Manipulation Types
 */
 
-// type Keys = 'name' | 'address';
-// type Accessors = 'get' | 'set';
+type Keys = "name" | "address";
+type Accessors = "get" | "set";
+
+type AccessorMethods = Record<Accessors, Keys>;
 
 /*  
         Task 7
     ~ Given a type with optional properties
     ~ Based on the User type, create a type without optional properties using type modifiers
 */
-// type User = {
-//     id: string;
-//     name: string;
-//     age?: number;
-//     sex?: string;
-//   };
+
+type User = {
+  id: string;
+  name: string;
+  age?: number;
+  sex?: string;
+};
+
+type StrictUser = { [Property in keyof User]-?: any };
+
+// Or with generic approach
+type CreateStrictUser<Type> = { [Property in keyof Type]-?: any };
+
+type StrictUserWithGeneric = CreateStrictUser<User>;
 
 /*  
         Task 8
@@ -133,23 +170,25 @@ console.log(getRandomElement<number>());
     ~ When you try to change the title, the compiler should give an error. 
 */
 
-// interface Topic {
-//     title: string;
-//   }
+interface Topic {
+  readonly title: string;
+}
 
-//   const topic: Topic = {
-//     title: "Main",
-//   };
+const topic: Topic = {
+  title: "Main",
+};
+
+//topic.title = 'new title'
 
 /*  
         Task 9
     ~ Define the type Coordinate as the return type of the getCoordinates function using Utility Types.
 */
 
-// function getCoordinates() {
-//     return { x: 10, y: 3 }
-//   }
-// type Coordinate = ?
+function getCoordinates(): { x: number; y: number } {
+  return { x: 10, y: 3 };
+}
+type Coordinate = ReturnType<typeof getCoordinates>;
 
 // ADVANCED LEVEL
 
@@ -160,28 +199,46 @@ console.log(getRandomElement<number>());
     ~ action.type can only be of three types (increment, decrement, reset)
 */
 
-// const reducer = (state, action) => {
-//   switch (action.type) {
-//     case "increment":
-//       return state + action.amount;
-//     case "decrement":
-//       return state - action.amount;
-//     case "reset":
-//       return action.value;
-//   }
-// };
+type Action = {
+  type: "increment" | "decrement" | "reset";
+  amount?: number;
+  value?: number;
+};
+
+const reducer = (state: number, action: Action) => {
+  switch (action.type) {
+    case "increment":
+      // I think it is a better solution, because for the proper working an amount is needed, but this wasn't in the task.
+      //   if (!action.amount) {
+      //     throw new Error("action.amount is not provided!");
+      //   }
+
+      // If the action.amount is undefined then it will be 0
+      return state + (action.amount || 0);
+    case "decrement":
+      // If the action.amount is undefined then it will be 0
+      return state - (action.amount || 0);
+    case "reset":
+      return action.value;
+  }
+};
 
 // Examples of using
 
-// reducer(100, {
-//     type: 'increment',
-//     amount: 10,
-// }) === 110; //true
+console.log("\nTASK10");
+console.log(
+  reducer(100, {
+    type: "increment",
+    amount: 10,
+  }) === 110
+); //true
 
-// reducer(100, {
-//     type: 'reset',
-//     value: 0,
-// }) === 0; //true
+console.log(
+  reducer(100, {
+    type: "reset",
+    value: 0,
+  }) === 0
+); //true
 
 /*  
         Task 11
@@ -189,12 +246,12 @@ console.log(getRandomElement<number>());
     ~ Get rid of overloading the createButton function by using conditional types.
 */
 
-// interface CircleButton {
-//     radius: number
-//    }
-// interface TextButton {
-//     title: string
-//    }
+interface CircleButton {
+  radius: number;
+}
+interface TextButton {
+  title: string;
+}
 
 //    function createButton(value: number): CircleButton
 //    function createButton(value: string): TextButton
@@ -202,3 +259,14 @@ console.log(getRandomElement<number>());
 //    function createButton(radiusOrTitle: string | number): CircleButton | TextButton {
 //     throw 'Not implemented'
 //    }
+
+type CircleOrTextButton<T extends number | string> = T extends number
+  ? CircleButton
+  : TextButton;
+
+declare function createButton<T extends number | string>(
+  value: T
+): CircleOrTextButton<T>;
+
+const circleButton = createButton(1);
+const textButton = createButton("text");
