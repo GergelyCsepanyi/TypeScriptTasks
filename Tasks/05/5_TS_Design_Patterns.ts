@@ -45,40 +45,42 @@
     Describe this situation by implementing a design pattern with text message output to the console.
 */
 
-class Car {
-  ride(): void {
-    console.log("Ride a car.");
+namespace Task1 {
+  class Car {
+    ride(): void {
+      console.log("Ride a car.");
+    }
   }
+
+  class TowTruck {
+    tow(): void {
+      console.log("Tow a car.");
+    }
+  }
+
+  class TowTruckAdapter extends Car {
+    towTruck: TowTruck;
+
+    constructor(towTruck: TowTruck) {
+      super();
+      this.towTruck = towTruck;
+    }
+    ride(): void {
+      this.towTruck.tow();
+    }
+  }
+
+  console.log("\nTASK1");
+
+  const car = new Car();
+  car.ride();
+
+  const towTruck = new TowTruck();
+  towTruck.tow();
+
+  const towTurckAdapter = new TowTruckAdapter(towTruck);
+  towTurckAdapter.ride();
 }
-
-class TowTruck {
-  tow(): void {
-    console.log("Tow a car.");
-  }
-}
-
-class TowTruckAdapter extends Car {
-  towTruck: TowTruck;
-
-  constructor(towTruck: TowTruck) {
-    super();
-    this.towTruck = towTruck;
-  }
-  ride(): void {
-    this.towTruck.tow();
-  }
-}
-
-console.log("\nTASK1");
-
-const car = new Car();
-car.ride();
-
-const towTruck = new TowTruck();
-towTruck.tow();
-
-const towTurckAdapter = new TowTruckAdapter(towTruck);
-towTurckAdapter.ride();
 
 /*
         Task 2
@@ -87,128 +89,130 @@ towTurckAdapter.ride();
     firm and the owner of the house, after turning off the alarm, they also receive a corresponding notification.
 */
 
-// The name of EventListener would be better, but it is taken
-interface Listener {
-  update(message: string): void;
+namespace Task2 {
+  // The name of EventListener would be better, but it is taken
+  interface Listener {
+    update(message: string): void;
+  }
+
+  type AlarmMode = "on" | "off";
+
+  class AlarmEventManager {
+    private subscribers: Listener[] = [];
+
+    subscribe(subscriber: Listener) {
+      this.subscribers.push(subscriber);
+    }
+
+    unSubscribe(subscriber: Listener) {
+      this.subscribers = this.subscribers.filter(
+        (currentSub) => currentSub.toString() === subscriber.toString()
+      );
+    }
+
+    notify(address: string, alarmMode: AlarmMode) {
+      this.subscribers.forEach((subscriber) => {
+        if (
+          subscriber instanceof Owner &&
+          (subscriber as Owner).getAddress() === address
+        ) {
+          subscriber.update(`Your house's alarm has turned ` + alarmMode);
+        } else if (subscriber instanceof SecurityGuard) {
+          subscriber.update(
+            `The alarm in address of '${address}' has turned ${alarmMode}`
+          );
+        }
+      });
+    }
+  }
+
+  class Person {
+    private name: string;
+
+    constructor(name: string) {
+      this.name = name;
+    }
+
+    getName() {
+      return this.name;
+    }
+  }
+
+  class Owner extends Person implements Listener {
+    addressOfHouse: string;
+
+    constructor(name: string, addressOfHouse: string) {
+      super(name);
+      this.addressOfHouse = addressOfHouse;
+    }
+
+    getAddress() {
+      return this.addressOfHouse;
+    }
+
+    update(message: string): void {
+      console.log(message);
+    }
+  }
+
+  class SecurityGuard extends Person implements Listener {
+    constructor(name: string) {
+      super(name);
+    }
+    update(message: string): void {
+      console.log(message);
+    }
+  }
+
+  class House {
+    private owner: Owner;
+    private alarmEventManager: AlarmEventManager;
+    private address: string;
+
+    constructor(
+      owner: Owner,
+      alarmEventManager: AlarmEventManager,
+      address: string
+    ) {
+      this.owner = owner;
+      this.alarmEventManager = alarmEventManager;
+      this.address = address;
+    }
+
+    getOwner() {
+      return this.owner;
+    }
+
+    getAddress() {
+      return this.address;
+    }
+
+    alarmOn() {
+      this.alarmEventManager.notify(this.address, "on");
+    }
+
+    alarmOff() {
+      this.alarmEventManager.notify(this.address, "off");
+    }
+  }
+
+  const house1Address = "Some City, Test Street 1";
+  const owner = new Owner("Bob", house1Address);
+  const securityGuard = new SecurityGuard("Home Security Service");
+  const alarmEventManager = new AlarmEventManager();
+  const house = new House(owner, alarmEventManager, house1Address);
+
+  alarmEventManager.subscribe(owner);
+  alarmEventManager.subscribe(securityGuard);
+
+  console.log("\nTASK2");
+
+  house.alarmOn();
+  house.alarmOff();
+  // setTimeout(() => {
+  //   house.alarmOff();
+  // }, 1000);
 }
-
-type AlarmMode = "on" | "off";
-
-class AlarmEventManager {
-  private subscribers: Listener[] = [];
-
-  subscribe(subscriber: Listener) {
-    this.subscribers.push(subscriber);
-  }
-
-  unSubscribe(subscriber: Listener) {
-    this.subscribers = this.subscribers.filter(
-      (currentSub) => currentSub.toString() === subscriber.toString()
-    );
-  }
-
-  notify(address: string, alarmMode: AlarmMode) {
-    this.subscribers.forEach((subscriber) => {
-      if (
-        subscriber instanceof Owner &&
-        (subscriber as Owner).getAddress() === address
-      ) {
-        subscriber.update(`Your house's alarm has turned ` + alarmMode);
-      } else if (subscriber instanceof SecurityGuard) {
-        subscriber.update(
-          `The alarm in address of '${address}' has turned ${alarmMode}`
-        );
-      }
-    });
-  }
-}
-
-class Person {
-  private name: string;
-
-  constructor(name: string) {
-    this.name = name;
-  }
-
-  getName() {
-    return this.name;
-  }
-}
-
-class Owner extends Person implements Listener {
-  addressOfHouse: string;
-
-  constructor(name: string, addressOfHouse: string) {
-    super(name);
-    this.addressOfHouse = addressOfHouse;
-  }
-
-  getAddress() {
-    return this.addressOfHouse;
-  }
-
-  update(message: string): void {
-    console.log(message);
-  }
-}
-
-class SecurityGuard extends Person implements Listener {
-  constructor(name: string) {
-    super(name);
-  }
-  update(message: string): void {
-    console.log(message);
-  }
-}
-
-class House {
-  private owner: Owner;
-  private alarmEventManager: AlarmEventManager;
-  private address: string;
-
-  constructor(
-    owner: Owner,
-    alarmEventManager: AlarmEventManager,
-    address: string
-  ) {
-    this.owner = owner;
-    this.alarmEventManager = alarmEventManager;
-    this.address = address;
-  }
-
-  getOwner() {
-    return this.owner;
-  }
-
-  getAddress() {
-    return this.address;
-  }
-
-  alarmOn() {
-    this.alarmEventManager.notify(this.address, "on");
-  }
-
-  alarmOff() {
-    this.alarmEventManager.notify(this.address, "off");
-  }
-}
-
-const house1Address = "Some City, Test Street 1";
-const owner = new Owner("Bob", house1Address);
-const securityGuard = new SecurityGuard("Home Security Service");
-const alarmEventManager = new AlarmEventManager();
-const house = new House(owner, alarmEventManager, house1Address);
-
-alarmEventManager.subscribe(owner);
-alarmEventManager.subscribe(securityGuard);
-
-console.log("\nTASK2");
-
-house.alarmOn();
-house.alarmOff();
-// setTimeout(() => {
-//   house.alarmOff();
-// }, 1000);
 
 /* 
         Task 3
@@ -217,96 +221,99 @@ house.alarmOff();
     The factory should provide the ability to create devices of any brand and any type.
 */
 
-abstract class Phone {
-  abstract create(): void;
-}
-
-abstract class Tablet {
-  abstract create(): void;
-}
-
-abstract class Computer {
-  abstract create(): void;
-}
-
-class SamsungPhone implements Phone {
-  create(): void {
-    console.log("Create Samsung Phone");
+namespace Task3 {
+  abstract class Phone {
+    abstract create(): void;
   }
+
+  abstract class Tablet {
+    abstract create(): void;
+  }
+
+  abstract class Computer {
+    abstract create(): void;
+  }
+
+  class SamsungPhone implements Phone {
+    create(): void {
+      console.log("Create Samsung Phone");
+    }
+  }
+
+  class SamsungTablet implements Tablet {
+    create(): void {
+      console.log("Create Samsung Tablet");
+    }
+  }
+
+  class SamsungComputer implements Computer {
+    create(): void {
+      console.log("Create Samsung Computer");
+    }
+  }
+
+  class ApplePhone implements Phone {
+    create(): void {
+      console.log("Create Apple Phone");
+    }
+  }
+
+  class AppleTablet implements Tablet {
+    create(): void {
+      console.log("Create Apple Tablet");
+    }
+  }
+
+  class AppleComputer implements Computer {
+    create(): void {
+      console.log("Create Apple Computer");
+    }
+  }
+
+  abstract class CompanyFactory {
+    abstract createPhone(): Phone;
+    abstract createTablet(): Tablet;
+    abstract createComputer(): Computer;
+  }
+
+  class SamsungFactory implements CompanyFactory {
+    createPhone(): Phone {
+      return new SamsungPhone();
+    }
+    createTablet(): Tablet {
+      return new SamsungTablet();
+    }
+    createComputer(): Computer {
+      return new SamsungComputer();
+    }
+  }
+
+  class AppleFactory implements CompanyFactory {
+    createPhone(): Phone {
+      return new ApplePhone();
+    }
+    createTablet(): Tablet {
+      return new AppleTablet();
+    }
+    createComputer(): Computer {
+      return new AppleComputer();
+    }
+  }
+
+  const createCompany = (factory: CompanyFactory): void => {
+    const phone = factory.createPhone();
+    const tablet = factory.createTablet();
+    const computer = factory.createComputer();
+
+    phone.create();
+    tablet.create();
+    computer.create();
+  };
+
+  console.log("\nTASK3");
+  createCompany(new SamsungFactory());
+  createCompany(new AppleFactory());
 }
-
-class SamsungTablet implements Tablet {
-  create(): void {
-    console.log("Create Samsung Tablet");
-  }
-}
-
-class SamsungComputer implements Computer {
-  create(): void {
-    console.log("Create Samsung Computer");
-  }
-}
-
-class ApplePhone implements Phone {
-  create(): void {
-    console.log("Create Apple Phone");
-  }
-}
-
-class AppleTablet implements Tablet {
-  create(): void {
-    console.log("Create Apple Tablet");
-  }
-}
-
-class AppleComputer implements Computer {
-  create(): void {
-    console.log("Create Apple Computer");
-  }
-}
-
-abstract class CompanyFactory {
-  abstract createPhone(): Phone;
-  abstract createTablet(): Tablet;
-  abstract createComputer(): Computer;
-}
-
-class SamsungFactory implements CompanyFactory {
-  createPhone(): Phone {
-    return new SamsungPhone();
-  }
-  createTablet(): Tablet {
-    return new SamsungTablet();
-  }
-  createComputer(): Computer {
-    return new SamsungComputer();
-  }
-}
-
-class AppleFactory implements CompanyFactory {
-  createPhone(): Phone {
-    return new ApplePhone();
-  }
-  createTablet(): Tablet {
-    return new AppleTablet();
-  }
-  createComputer(): Computer {
-    return new AppleComputer();
-  }
-}
-
-const createCompany = (factory: CompanyFactory): void => {
-  const phone = factory.createPhone();
-  const tablet = factory.createTablet();
-  const computer = factory.createComputer();
-
-  phone.create();
-  tablet.create();
-  computer.create();
-};
-
-createCompany(new SamsungFactory());
-createCompany(new AppleFactory());
 
 // ADVANCED LEVEL
 /*
@@ -317,18 +324,168 @@ createCompany(new AppleFactory());
     I received an order for two menus (Cheeseburger menu and Hamburger menu), one with juice, and the second with cola and donut.
     Help the fast food cook and display the order in the console without creating new menu types.
 */
+namespace Task4 {
+  type Juice = "orange_juice" | "cola" | "soda";
+  type Dessert = "donut" | "ice_cream";
+  type MenuType = "cheeseburger" | "hamburger";
 
-//Add code here...
+  interface MenuExtension {
+    addJuice(juice: Juice): void;
+    addDessert(dessert: Dessert): void;
+  }
+
+  class Menu implements MenuExtension {
+    protected menuType: MenuType;
+
+    constructor(menuType: MenuType) {
+      this.menuType = menuType;
+      this.createMenu(menuType);
+    }
+    createMenu(menuType: MenuType): void {
+      console.log(`Create menu: ${menuType}`);
+    }
+
+    addJuice(juice: Juice): void {
+      console.log(`Add juice: ${juice} to menu: ${this.menuType} menu`);
+    }
+    addDessert(dessert: Dessert): void {
+      console.log(`Add dessert: ${dessert} to menu: ${this.menuType} menu`);
+    }
+  }
+
+  class MenuDecorator implements MenuExtension {
+    protected wrappee: MenuExtension;
+
+    constructor(menu: MenuExtension) {
+      this.wrappee = menu;
+    }
+
+    addJuice(juice: Juice): void {
+      this.wrappee.addJuice(juice);
+    }
+    addDessert(dessert: Dessert): void {
+      this.wrappee.addDessert(dessert);
+    }
+  }
+
+  class CheeseburgerMenuDecorator extends MenuDecorator {
+    addJuice(juice: Juice): void {
+      super.addJuice(juice);
+    }
+
+    addDessert(dessert: Dessert): void {
+      super.addDessert(dessert);
+    }
+  }
+
+  class HamburgerMenuDecorator extends MenuDecorator {
+    addJuice(juice: Juice): void {
+      super.addJuice(juice);
+    }
+
+    addDessert(dessert: Dessert): void {
+      super.addDessert(dessert);
+    }
+  }
+
+  console.log("\nTASK4");
+
+  const cheeseburgerMenu = new CheeseburgerMenuDecorator(
+    new Menu("cheeseburger")
+  );
+  const hamburgerMenu = new HamburgerMenuDecorator(new Menu("hamburger"));
+
+  cheeseburgerMenu.addJuice("orange_juice");
+  hamburgerMenu.addJuice("cola");
+  hamburgerMenu.addDessert("donut");
+}
 
 /*
-        Task 5
-    Implement the Facade pattern in the following context:
+  Task 5
+  Implement the Facade pattern in the following context:
     You have a smart home. It is filled with many devices.
     When you leave or come home, every time you repeat a lot of the same actions (on / off lights, air conditioning, music, etc.).
     Create two programmed behaviors of the smart home system - "the owner came home", "the owner left home".
 */
+namespace Task5 {
+  type Switches = "on" | "off";
 
-//Add code here...
+  // Complex class
+  class SmartHome {
+    private lights: Switches;
+    private airConditioner: Switches;
+    private music: Switches;
+
+    constructor(lights: Switches, airConditioner: Switches, music: Switches) {
+      this.lights = lights;
+      this.airConditioner = airConditioner;
+      this.music = music;
+    }
+
+    turnLightsOn() {
+      if (this.lights === "off") {
+        this.lights = "on";
+        console.log("The lights has turned on.");
+      }
+    }
+    turnLightsOff() {
+      if (this.lights === "on") {
+        this.lights = "off";
+        console.log("The lights has turned off.");
+      }
+    }
+    turnAirConditionOn() {
+      if (this.airConditioner === "off") {
+        this.airConditioner = "on";
+        console.log("The air conditioner has turned on.");
+      }
+    }
+    turnAirConditionOff() {
+      if (this.airConditioner === "on") {
+        this.airConditioner = "off";
+        console.log("The air conditioner has turned off.");
+      }
+    }
+    musicOn() {
+      if (this.music === "off") {
+        this.music = "on";
+        console.log("The music has turned on.");
+      }
+    }
+    musicOff() {
+      if (this.music === "on") {
+        this.music = "off";
+        console.log("The music has turned off.");
+      }
+    }
+  }
+
+  // The facade class
+  class SmartHomeSystem {
+    private smartHome = new SmartHome("off", "off", "off");
+
+    ownerComeHome() {
+      console.log("the owner came home");
+      this.smartHome.turnLightsOn();
+      this.smartHome.turnAirConditionOn();
+      this.smartHome.musicOn();
+    }
+
+    ownerLeftHome() {
+      console.log("the owner left home");
+      this.smartHome.turnLightsOff();
+      this.smartHome.turnAirConditionOff();
+      this.smartHome.musicOff();
+    }
+  }
+
+  console.log("\nTASK5");
+  const smartHomeSystem = new SmartHomeSystem();
+
+  smartHomeSystem.ownerComeHome();
+  console.log("");
+  smartHomeSystem.ownerLeftHome();
+}
 
 /*
         Task 6
@@ -342,4 +499,117 @@ createCompany(new AppleFactory());
       - Publish and Cancel methods cannot be called from the 'published' state
 */
 
-//Add code here...
+/*
+ 
+  abstract class State
+    # context
+    + setContext()
+    abs + Publish()
+    abs + Cancel()
+  
+  class WaitingForReview ext State
+    + Publish()
+    + Cancel()
+
+  class InReview ext State
+    + Publish()
+    + Cancel()
+
+  class ReadyForSale ext State
+    + Publish()
+    + Cancel()
+  
+  class Published ext State
+    + Publish()
+    + Cancel()
+
+  class Context
+    - state
+    transitionTo(state)
+    + Publish()
+    + Cancel()
+
+ */
+
+namespace Task6 {
+  abstract class State {
+    context: Context | null = null;
+
+    setContext(context: Context) {
+      this.context = context;
+    }
+
+    abstract Publish(): void;
+    abstract Cancel(): void;
+  }
+
+  class WaitingForReview extends State {
+    Publish(): void {
+      console.log("Changing to 'review' state...");
+      this.context?.transitionTo(new InReview());
+    }
+
+    Cancel(): void {}
+  }
+
+  class InReview extends State {
+    // It's value should comes from outside this class or from a function in this class (like Validate():boolean)
+    errorDuringReview = false;
+
+    Publish(): void {
+      if (this.errorDuringReview) {
+        console.log("An error happend during validation!");
+        this.Cancel();
+      } else {
+        console.log("Changing to 'ready for sale' state...");
+        this.context?.transitionTo(new ReadyForSale());
+      }
+    }
+    Cancel(): void {
+      console.log("Going back to the initial state...");
+      this.context?.transitionTo(new WaitingForReview());
+    }
+  }
+
+  class ReadyForSale extends State {
+    Publish(): void {
+      console.log("Changing to 'published' state...");
+      this.context?.transitionTo(new Published());
+    }
+    Cancel(): void {
+      console.log("Going back to the initial state...");
+      this.context?.transitionTo(new WaitingForReview());
+    }
+  }
+
+  class Published extends State {
+    Publish(): void {}
+    Cancel(): void {}
+  }
+
+  class Context {
+    state: State | null = null;
+
+    constructor(state: State) {
+      this.transitionTo(state);
+    }
+
+    transitionTo(state: State) {
+      this.state = state;
+      this.state.setContext(this);
+    }
+    Publish(): void {
+      this.state?.Publish();
+    }
+    Cancel(): void {
+      this.state?.Cancel();
+    }
+  }
+
+  console.log("\nTASK6");
+  const context = new Context(new WaitingForReview());
+  context.Publish();
+  context.Publish();
+  context.Cancel();
+  context.Publish();
+}
