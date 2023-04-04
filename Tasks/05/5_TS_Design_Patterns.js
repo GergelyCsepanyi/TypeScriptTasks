@@ -89,56 +89,25 @@ var Task2;
             this.subscribers.push(subscriber);
         }
         unSubscribe(subscriber) {
-            this.subscribers = this.subscribers.filter((currentSub) => currentSub.toString() === subscriber.toString());
+            this.subscribers = this.subscribers.filter((currentSub) => JSON.stringify(currentSub) !== JSON.stringify(subscriber));
         }
         notify(address, alarmMode) {
             this.subscribers.forEach((subscriber) => {
-                if (subscriber instanceof Owner &&
-                    subscriber.getAddress() === address) {
-                    subscriber.update(`Your house's alarm has turned ` + alarmMode);
-                }
-                else if (subscriber instanceof SecurityGuard) {
+                if (subscriber.type === "security" &&
+                    subscriber.addresses.includes(address)) {
                     subscriber.update(`The alarm in address of '${address}' has turned ${alarmMode}`);
+                }
+                else if (subscriber.type === "owner" &&
+                    subscriber.address === address) {
+                    subscriber.update(`Your house's alarm has turned ${alarmMode} (${address})`);
                 }
             });
         }
     }
-    class Person {
-        constructor(name) {
-            this.name = name;
-        }
-        getName() {
-            return this.name;
-        }
-    }
-    class Owner extends Person {
-        constructor(name, addressOfHouse) {
-            super(name);
-            this.addressOfHouse = addressOfHouse;
-        }
-        getAddress() {
-            return this.addressOfHouse;
-        }
-        update(message) {
-            console.log(message);
-        }
-    }
-    class SecurityGuard extends Person {
-        constructor(name) {
-            super(name);
-        }
-        update(message) {
-            console.log(message);
-        }
-    }
     class House {
-        constructor(owner, alarmEventManager, address) {
-            this.owner = owner;
+        constructor(alarmEventManager, address) {
             this.alarmEventManager = alarmEventManager;
             this.address = address;
-        }
-        getOwner() {
-            return this.owner;
         }
         getAddress() {
             return this.address;
@@ -151,18 +120,55 @@ var Task2;
         }
     }
     const house1Address = "Some City, Test Street 1";
-    const owner = new Owner("Bob", house1Address);
-    const securityGuard = new SecurityGuard("Home Security Service");
+    const house2Address = "Some City, Test Street 2";
     const alarmEventManager = new AlarmEventManager();
-    const house = new House(owner, alarmEventManager, house1Address);
-    alarmEventManager.subscribe(owner);
-    alarmEventManager.subscribe(securityGuard);
+    const house1 = new House(alarmEventManager, house1Address);
+    const house2 = new House(alarmEventManager, house2Address);
+    const owner1 = {
+        type: "owner",
+        address: house1Address,
+        update: function (message) {
+            console.log(message);
+        },
+    };
+    const owner2 = {
+        type: "owner",
+        address: house2Address,
+        update: function (message) {
+            console.log(message);
+        },
+    };
+    const security = {
+        type: "security",
+        addresses: [house1Address, house2Address],
+        update: function (message) {
+            console.log(message);
+        },
+    };
+    const getUpdatedSecurityAddresses = (security, addressToRemove) => {
+        return security.addresses.filter((address) => address !== addressToRemove);
+    };
+    alarmEventManager.subscribe(owner1);
+    alarmEventManager.subscribe(owner2);
+    alarmEventManager.subscribe(security);
     console.log("\nTASK2");
-    house.alarmOn();
-    house.alarmOff();
-    // setTimeout(() => {
-    //   house.alarmOff();
-    // }, 1000);
+    console.log("House 1");
+    house1.alarmOn();
+    house1.alarmOff();
+    console.log("\nHouse 2");
+    house2.alarmOn();
+    house2.alarmOff();
+    alarmEventManager.unSubscribe(owner2);
+    // We have to remove the unsubscribed owner's address from the security addresses array
+    security.addresses = getUpdatedSecurityAddresses(security, owner2.address);
+    console.log(`\nUnsubscribe owner2 (House 2, ${owner2.address})\n`);
+    console.log("House 1");
+    house1.alarmOn();
+    house1.alarmOff();
+    console.log();
+    // Won't notify
+    house2.alarmOn();
+    house2.alarmOff();
 })(Task2 || (Task2 = {}));
 /*
         Task 3
