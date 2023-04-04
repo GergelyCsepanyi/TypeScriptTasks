@@ -86,11 +86,11 @@ namespace Task2 {
     occupation?: string;
   }
 
-  export interface Admin extends User {
+  export type Admin = Omit<User, "occupation"> & {
     role?: string;
-  }
+  };
 
-  export const users: Admin[] = [
+  export const users: (User | Admin)[] = [
     {
       name: "Max Mustermann",
       age: 25,
@@ -147,7 +147,7 @@ namespace Task3 {
   ];
 
   export function logPerson(user: User | Admin) {
-    if (typeof (user as Admin).role !== "undefined") {
+    if ("role" in user) {
       console.log(` - ${user.name}, ${user.age}, ${(user as Admin).role}`);
     } else {
       console.log(` - ${user.name}, ${user.age}, ${user.occupation}`);
@@ -250,7 +250,7 @@ namespace Task5 {
     type: "superuser";
   }
 
-  type PersonsArray = User[] | Admin[] | SuperUser[];
+  type PersonsArray = (User | Admin | SuperUser)[];
 
   export const persons: PersonsArray = [
     // Users
