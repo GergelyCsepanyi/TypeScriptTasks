@@ -258,7 +258,9 @@ namespace Task7 {
 namespace Task8 {
   console.log("\nTASK 8");
 
-  const addAndHandle = (x: number, y: number, callback: any): void => {
+  type Callback = (result: number) => void;
+
+  const addAndHandle = (x: number, y: number, callback: Callback): void => {
     const result = sum(x, y);
     callback(result);
   };
@@ -348,22 +350,17 @@ printCountry(countries);
     ~ The 'without' method must return a copy of the object, excluding all properties of the specified type.
 */
 
-const without = (inputObj: any, withoutThisType: any): any => {
-  // The output object
+const without = (inputObj: object, withoutThisType: string): object => {
   const outputObj = {};
 
-  // Loop through the inputObject's keys
   for (let key of Object.keys(inputObj)) {
-    // If the actual value's type is not the same as the withoutThisType
     if (typeof inputObj[key] !== withoutThisType) {
-      // Add the value to the output object
       outputObj[key] = inputObj[key];
     }
   }
   return outputObj;
 };
 
-// An object to try out the function
 const obj1 = {
   name: "Bob",
   age: 21,

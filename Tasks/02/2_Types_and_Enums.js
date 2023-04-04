@@ -291,19 +291,14 @@ printCountry(countries);
     ~ The 'without' method must return a copy of the object, excluding all properties of the specified type.
 */
 const without = (inputObj, withoutThisType) => {
-    // The output object
     const outputObj = {};
-    // Loop through the inputObject's keys
     for (let key of Object.keys(inputObj)) {
-        // If the actual value's type is not the same as the withoutThisType
         if (typeof inputObj[key] !== withoutThisType) {
-            // Add the value to the output object
             outputObj[key] = inputObj[key];
         }
     }
     return outputObj;
 };
-// An object to try out the function
 const obj1 = {
     name: "Bob",
     age: 21,
