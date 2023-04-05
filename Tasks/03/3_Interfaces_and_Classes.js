@@ -112,7 +112,7 @@ var Task3;
         { name: "Bruce Willis", age: 64, role: "World saver" },
     ];
     function logPerson(user) {
-        if (typeof user.role !== "undefined") {
+        if ("role" in user) {
             console.log(` - ${user.name}, ${user.age}, ${user.role}`);
         }
         else {
