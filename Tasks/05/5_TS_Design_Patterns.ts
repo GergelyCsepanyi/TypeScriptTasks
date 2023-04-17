@@ -123,20 +123,21 @@ namespace Task2 {
 
     notify(address: string, alarmMode: AlarmMode) {
       this.subscribers.forEach((subscriber) => {
-        if (
-          subscriber.type === "security" &&
-          subscriber.addresses.includes(address)
-        ) {
-          subscriber.update(
-            `The alarm in address of '${address}' has turned ${alarmMode}`
-          );
-        } else if (
-          subscriber.type === "owner" &&
-          subscriber.address === address
-        ) {
-          subscriber.update(
-            `Your house's alarm has turned ${alarmMode} (${address})`
-          );
+        switch (true) {
+          case subscriber.type === "security" &&
+            subscriber.addresses.includes(address):
+            subscriber.update(
+              `The alarm in address of '${address}' has turned ${alarmMode}`
+            );
+            break;
+
+          case subscriber.type === "owner" && subscriber.address === address:
+            subscriber.update(
+              `Your house's alarm has turned ${alarmMode} (${address})`
+            );
+            break;
+          default:
+            break;
         }
       });
     }
